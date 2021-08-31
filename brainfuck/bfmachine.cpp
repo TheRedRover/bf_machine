@@ -44,7 +44,6 @@ mvlc::mvlc( std::shared_ptr<int> head, char *buf, int am) : cmd(head, buf, am) {
 
 void mvrc::fn()
 {
-    std::cout<<"Moving right\n";
     if(((*head)+=am)<0)
         throw std::logic_error("");
     if(nxt_)
@@ -75,10 +74,6 @@ blc::blc( std::shared_ptr<int> head, char *buf, int am) : cmd(head, buf, am) {}
 
 void elc::fn()
 {
-    if(!nxt_)
-        std::cout<<"ELC - NEXT POINTER IS NULLPTR\n";
-    if(!blc)
-        std::cout<<"ELC - BEGIN LOOP POINTER IS NULLPTR\n";
     if(buf[*head]==0)
     {
         if (nxt_)
@@ -89,9 +84,9 @@ void elc::fn()
 
 }
 
-void elc::set_blc(cmd *blc_)
+void elc::set_blc(cmd * blc_)
 {
-    blc_ = blc_;
+    blc = blc_;
 }
 
 elc::elc( std::shared_ptr<int> head, char *buf, int am) : cmd(head, buf, am) {}
@@ -131,7 +126,7 @@ void bfmachine::init( const std::string &str)
     std::shared_ptr<int> head_ptr = std::make_shared<int>(head);
 
 
-    std::stack<std::unique_ptr<elc>> stack;
+    std::stack<blc*> stack;
     auto ps = s_to_ps(str);
     if(ps.empty())
         throw std::logic_error("There isn't bfmachine code in string/file");
@@ -163,21 +158,22 @@ void bfmachine::init( const std::string &str)
             }
             case LEFT_BRACKET: {
                 auto blc_ = std::make_unique<blc>(head_ptr, cpu_first, p.second);
-                auto elc_ = std::make_unique<elc>(head_ptr, cpu_first, p.second);
-                blc_->set_elc(elc_.get());
-                stack.push(std::move(elc_));
+                stack.push(blc_.get());
                 current_ptr->nxt(std::move(blc_));
                 current_ptr = current_ptr->get_nxt();
-                stack.top()->set_blc(current_ptr);
                 break;
             }
             case RIGHT_BRACKET: {
                 if (stack.empty())
                     throw std::logic_error("Left bracket '[' is missing");
-                if(!stack.top()->blc)
-                    std::cout<<"LOOOOOOOK!!!\n";
-                current_ptr->nxt(std::move(stack.top()));
-
+                auto elc_ = std::make_unique<elc>(head_ptr, cpu_first, p.second);
+                stack.top()->set_elc(elc_.get());
+                if(stack.top()== nullptr)
+                    std::cout<<"WTHF???\n";
+                elc_->set_blc(stack.top());
+                if(elc_->blc== nullptr)
+                    std::cout<<"FUCK!\n";
+                current_ptr->nxt(std::move(elc_));
                 current_ptr = current_ptr->get_nxt();
                 stack.pop();
                 break;
