@@ -61,7 +61,6 @@ public:
     mvrc( std::shared_ptr<int> head, char *buf, int am);
     void fn() override;
 };
-
 class blc : public cmd
 {
 private:
@@ -71,7 +70,6 @@ public:
     void set_elc(cmd * elc_);
     void fn() override;
 };
-
 class elc : public cmd
 {
 private:
