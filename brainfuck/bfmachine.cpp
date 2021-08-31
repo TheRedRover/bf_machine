@@ -1,4 +1,5 @@
 #include <stack>
+#include <utility>
 #include "bfmachine.hpp"
 
 void cmd::nxt(std::unique_ptr<cmd> nxt)
@@ -11,7 +12,7 @@ cmd *cmd::get_nxt()
     return nxt_.get();
 }
 
-void cmd::fn(){ nxt_->fn(); }
+void cmd::fn(){ if(nxt_) nxt_->fn(); }
 
 void decc::fn()
 {
@@ -20,7 +21,7 @@ void decc::fn()
         nxt_->fn();
 }
 
-decc::decc( std::shared_ptr<int> head, char *buf, int am) : cmd(head, buf, am) {}
+decc::decc( std::shared_ptr<int> head, char *buf, int am) : cmd(std::move(head), buf, am) {}
 
 void incc::fn()
 {
@@ -29,7 +30,7 @@ void incc::fn()
         nxt_->fn();
 }
 
-incc::incc( std::shared_ptr<int> head, char *buf, int am) : cmd(head, buf, am) {}
+incc::incc( std::shared_ptr<int> head, char *buf, int am) : cmd(std::move(head), buf, am) {}
 
 
 void mvlc::fn()
@@ -40,7 +41,7 @@ void mvlc::fn()
         nxt_->fn();
 }
 
-mvlc::mvlc( std::shared_ptr<int> head, char *buf, int am) : cmd(head, buf, am) {}
+mvlc::mvlc( std::shared_ptr<int> head, char *buf, int am) : cmd(std::move(head), buf, am) {}
 
 void mvrc::fn()
 {
@@ -50,19 +51,14 @@ void mvrc::fn()
         nxt_->fn();
 }
 
-mvrc::mvrc( std::shared_ptr<int> head, char *buf, int am) : cmd(head, buf, am) {}
+mvrc::mvrc( std::shared_ptr<int> head, char *buf, int am) : cmd(std::move(head), buf, am) {}
 
 void blc::fn()
 {
-    if(!nxt_)
-        std::cout<<"BLC - NEXT POINTER IS NULLPTR\n";
-    if(!elc)
-        std::cout<<"BLC - BEGIN LOOP POINTER IS NULLPTR\n";
     if(buf[*head]==0)
         elc->fn();
     else
         nxt_->fn();
-
 }
 
 void blc::set_elc(cmd *elc_)
@@ -70,7 +66,7 @@ void blc::set_elc(cmd *elc_)
     elc = elc_;
 }
 
-blc::blc( std::shared_ptr<int> head, char *buf, int am) : cmd(head, buf, am) {}
+blc::blc( std::shared_ptr<int> head, char *buf, int am) : cmd(std::move(head), buf, am) {}
 
 void elc::fn()
 {
@@ -89,7 +85,7 @@ void elc::set_blc(cmd * blc_)
     blc = blc_;
 }
 
-elc::elc( std::shared_ptr<int> head, char *buf, int am) : cmd(head, buf, am) {}
+elc::elc( std::shared_ptr<int> head, char *buf, int am) : cmd(std::move(head), buf, am) {}
 
 void outc::fn()
 {
@@ -100,7 +96,7 @@ void outc::fn()
         nxt_->fn();
 }
 
-outc::outc( std::shared_ptr<int> head, char *buf, int am) : cmd(head, buf, am) {}
+outc::outc( std::shared_ptr<int> head, char *buf, int am) : cmd(std::move(head), buf, am) {}
 
 std::vector<std::pair<char, size_t>> bfmachine::s_to_ps( const std::string &str) {
     if(str.empty())
@@ -114,7 +110,7 @@ std::vector<std::pair<char, size_t>> bfmachine::s_to_ps( const std::string &str)
             ++c;
         else
         {
-            sps.push_back(std::make_pair(*(i-1),c));
+            sps.emplace_back(*(i-1),c);
             c=1;
         }
     }
@@ -128,8 +124,6 @@ void bfmachine::init( const std::string &str)
 
     std::stack<blc*> stack;
     auto ps = s_to_ps(str);
-    if(ps.empty())
-        throw std::logic_error("There isn't bfmachine code in string/file");
     cmd * current_ptr;
     first_cmd = std::make_unique<cmd>(cmd(head_ptr,cpu_first,1));
     current_ptr = first_cmd.get();
@@ -168,11 +162,7 @@ void bfmachine::init( const std::string &str)
                     throw std::logic_error("Left bracket '[' is missing");
                 auto elc_ = std::make_unique<elc>(head_ptr, cpu_first, p.second);
                 stack.top()->set_elc(elc_.get());
-                if(stack.top()== nullptr)
-                    std::cout<<"WTHF???\n";
                 elc_->set_blc(stack.top());
-                if(elc_->blc== nullptr)
-                    std::cout<<"FUCK!\n";
                 current_ptr->nxt(std::move(elc_));
                 current_ptr = current_ptr->get_nxt();
                 stack.pop();
@@ -189,7 +179,9 @@ void bfmachine::init( const std::string &str)
         }
     }
     if(!stack.empty())
-        throw std::logic_error("Right bracket ']' is missing");
+        throw std::logic_error("Right bracket ']' is missing\n");
+    if(current_ptr==first_cmd.get())
+        throw std::logic_error("There isn't brainfuck code in string/file\n");
 }
 
 void bfmachine::execute()

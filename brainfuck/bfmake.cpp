@@ -15,13 +15,10 @@ int main(int argc, char *argv[])
                 if (std::string(argv[1]) == "-f") {
                     std::string file_name = argv[2];
                     std::ifstream f(file_name);
-                    if (!f.good()) {
+                    if (!f.good())
                         throw std::invalid_argument("Such file doesn't exist\n");
-                    }
                     std::string str((std::istreambuf_iterator<char>(f)), std::istreambuf_iterator<char>());
-                    std::cout<<"Starting init..\n";
                     c.init(str);
-                    std::cout<<"Starting execution..\n";
                     c.execute();
                 }
                 break;
