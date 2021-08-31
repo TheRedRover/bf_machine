@@ -26,6 +26,7 @@ int main(int argc, char *argv[])
             default: {
                 std::cout << "To compile code string use command ' bfmachine \"code_string\"'\n" <<
                           "To compile program from file use command ' bfmachine -f \"src_file\"'\n";
+                break;
             }
         }
     }
