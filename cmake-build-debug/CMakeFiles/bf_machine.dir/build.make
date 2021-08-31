@@ -79,29 +79,29 @@ CMakeFiles/bf_machine.dir/brainfuck/bfmake.cpp.s: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Compiling CXX source to assembly CMakeFiles/bf_machine.dir/brainfuck/bfmake.cpp.s"
 	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /home/theredrover/projects/c++/bf_machine/brainfuck/bfmake.cpp -o CMakeFiles/bf_machine.dir/brainfuck/bfmake.cpp.s
 
-CMakeFiles/bf_machine.dir/brainfuck/brainfuck.cpp.o: CMakeFiles/bf_machine.dir/flags.make
-CMakeFiles/bf_machine.dir/brainfuck/brainfuck.cpp.o: ../brainfuck/brainfuck.cpp
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/theredrover/projects/c++/bf_machine/cmake-build-debug/CMakeFiles --progress-num=$(CMAKE_PROGRESS_2) "Building CXX object CMakeFiles/bf_machine.dir/brainfuck/brainfuck.cpp.o"
-	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -o CMakeFiles/bf_machine.dir/brainfuck/brainfuck.cpp.o -c /home/theredrover/projects/c++/bf_machine/brainfuck/brainfuck.cpp
+CMakeFiles/bf_machine.dir/brainfuck/bfmachine.cpp.o: CMakeFiles/bf_machine.dir/flags.make
+CMakeFiles/bf_machine.dir/brainfuck/bfmachine.cpp.o: ../brainfuck/bfmachine.cpp
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/theredrover/projects/c++/bf_machine/cmake-build-debug/CMakeFiles --progress-num=$(CMAKE_PROGRESS_2) "Building CXX object CMakeFiles/bf_machine.dir/brainfuck/bfmachine.cpp.o"
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -o CMakeFiles/bf_machine.dir/brainfuck/bfmachine.cpp.o -c /home/theredrover/projects/c++/bf_machine/brainfuck/bfmachine.cpp
 
-CMakeFiles/bf_machine.dir/brainfuck/brainfuck.cpp.i: cmake_force
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Preprocessing CXX source to CMakeFiles/bf_machine.dir/brainfuck/brainfuck.cpp.i"
-	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /home/theredrover/projects/c++/bf_machine/brainfuck/brainfuck.cpp > CMakeFiles/bf_machine.dir/brainfuck/brainfuck.cpp.i
+CMakeFiles/bf_machine.dir/brainfuck/bfmachine.cpp.i: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Preprocessing CXX source to CMakeFiles/bf_machine.dir/brainfuck/bfmachine.cpp.i"
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /home/theredrover/projects/c++/bf_machine/brainfuck/bfmachine.cpp > CMakeFiles/bf_machine.dir/brainfuck/bfmachine.cpp.i
 
-CMakeFiles/bf_machine.dir/brainfuck/brainfuck.cpp.s: cmake_force
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Compiling CXX source to assembly CMakeFiles/bf_machine.dir/brainfuck/brainfuck.cpp.s"
-	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /home/theredrover/projects/c++/bf_machine/brainfuck/brainfuck.cpp -o CMakeFiles/bf_machine.dir/brainfuck/brainfuck.cpp.s
+CMakeFiles/bf_machine.dir/brainfuck/bfmachine.cpp.s: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Compiling CXX source to assembly CMakeFiles/bf_machine.dir/brainfuck/bfmachine.cpp.s"
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /home/theredrover/projects/c++/bf_machine/brainfuck/bfmachine.cpp -o CMakeFiles/bf_machine.dir/brainfuck/bfmachine.cpp.s
 
 # Object files for target bf_machine
 bf_machine_OBJECTS = \
 "CMakeFiles/bf_machine.dir/brainfuck/bfmake.cpp.o" \
-"CMakeFiles/bf_machine.dir/brainfuck/brainfuck.cpp.o"
+"CMakeFiles/bf_machine.dir/brainfuck/bfmachine.cpp.o"
 
 # External object files for target bf_machine
 bf_machine_EXTERNAL_OBJECTS =
 
 bf_machine: CMakeFiles/bf_machine.dir/brainfuck/bfmake.cpp.o
-bf_machine: CMakeFiles/bf_machine.dir/brainfuck/brainfuck.cpp.o
+bf_machine: CMakeFiles/bf_machine.dir/brainfuck/bfmachine.cpp.o
 bf_machine: CMakeFiles/bf_machine.dir/build.make
 bf_machine: CMakeFiles/bf_machine.dir/link.txt
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --bold --progress-dir=/home/theredrover/projects/c++/bf_machine/cmake-build-debug/CMakeFiles --progress-num=$(CMAKE_PROGRESS_3) "Linking CXX executable bf_machine"

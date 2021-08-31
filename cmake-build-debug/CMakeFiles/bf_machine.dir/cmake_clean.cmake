@@ -1,6 +1,6 @@
 file(REMOVE_RECURSE
+  "CMakeFiles/bf_machine.dir/brainfuck/bfmachine.cpp.o"
   "CMakeFiles/bf_machine.dir/brainfuck/bfmake.cpp.o"
-  "CMakeFiles/bf_machine.dir/brainfuck/brainfuck.cpp.o"
   "bf_machine"
   "bf_machine.pdb"
 )

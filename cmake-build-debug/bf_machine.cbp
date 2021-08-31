@@ -82,13 +82,13 @@
 				</MakeCommands>
 			</Target>
 		</Build>
+		<Unit filename="/home/theredrover/projects/c++/bf_machine/brainfuck/bfmachine.cpp">
+			<Option target="bf_machine"/>
+		</Unit>
+		<Unit filename="/home/theredrover/projects/c++/bf_machine/brainfuck/bfmachine.hpp">
+			<Option target="bf_machine"/>
+		</Unit>
 		<Unit filename="/home/theredrover/projects/c++/bf_machine/brainfuck/bfmake.cpp">
-			<Option target="bf_machine"/>
-		</Unit>
-		<Unit filename="/home/theredrover/projects/c++/bf_machine/brainfuck/brainfuck.cpp">
-			<Option target="bf_machine"/>
-		</Unit>
-		<Unit filename="/home/theredrover/projects/c++/bf_machine/brainfuck/brainfuck.hpp">
 			<Option target="bf_machine"/>
 		</Unit>
 		<Unit filename="/home/theredrover/projects/c++/bf_machine/CMakeLists.txt">

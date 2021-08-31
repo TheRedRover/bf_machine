@@ -8,8 +8,8 @@ set(CMAKE_DEPENDS_LANGUAGES
   )
 # The set of files for implicit dependencies of each language:
 set(CMAKE_DEPENDS_CHECK_CXX
+  "/home/theredrover/projects/c++/bf_machine/brainfuck/bfmachine.cpp" "/home/theredrover/projects/c++/bf_machine/cmake-build-debug/CMakeFiles/bf_machine.dir/brainfuck/bfmachine.cpp.o"
   "/home/theredrover/projects/c++/bf_machine/brainfuck/bfmake.cpp" "/home/theredrover/projects/c++/bf_machine/cmake-build-debug/CMakeFiles/bf_machine.dir/brainfuck/bfmake.cpp.o"
-  "/home/theredrover/projects/c++/bf_machine/brainfuck/brainfuck.cpp" "/home/theredrover/projects/c++/bf_machine/cmake-build-debug/CMakeFiles/bf_machine.dir/brainfuck/brainfuck.cpp.o"
   )
 set(CMAKE_CXX_COMPILER_ID "GNU")
 

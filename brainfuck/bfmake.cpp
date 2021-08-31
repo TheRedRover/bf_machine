@@ -19,7 +19,9 @@ int main(int argc, char *argv[])
                         throw std::invalid_argument("Such file doesn't exist\n");
                     }
                     std::string str((std::istreambuf_iterator<char>(f)), std::istreambuf_iterator<char>());
+                    std::cout<<"Starting init..\n";
                     c.init(str);
+                    std::cout<<"Starting execution..\n";
                     c.execute();
                 }
                 break;

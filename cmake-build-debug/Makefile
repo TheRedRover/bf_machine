@@ -129,6 +129,30 @@ bf_machine/fast:
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/bf_machine.dir/build.make CMakeFiles/bf_machine.dir/build
 .PHONY : bf_machine/fast
 
+brainfuck/bfmachine.o: brainfuck/bfmachine.cpp.o
+.PHONY : brainfuck/bfmachine.o
+
+# target to build an object file
+brainfuck/bfmachine.cpp.o:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/bf_machine.dir/build.make CMakeFiles/bf_machine.dir/brainfuck/bfmachine.cpp.o
+.PHONY : brainfuck/bfmachine.cpp.o
+
+brainfuck/bfmachine.i: brainfuck/bfmachine.cpp.i
+.PHONY : brainfuck/bfmachine.i
+
+# target to preprocess a source file
+brainfuck/bfmachine.cpp.i:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/bf_machine.dir/build.make CMakeFiles/bf_machine.dir/brainfuck/bfmachine.cpp.i
+.PHONY : brainfuck/bfmachine.cpp.i
+
+brainfuck/bfmachine.s: brainfuck/bfmachine.cpp.s
+.PHONY : brainfuck/bfmachine.s
+
+# target to generate assembly for a file
+brainfuck/bfmachine.cpp.s:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/bf_machine.dir/build.make CMakeFiles/bf_machine.dir/brainfuck/bfmachine.cpp.s
+.PHONY : brainfuck/bfmachine.cpp.s
+
 brainfuck/bfmake.o: brainfuck/bfmake.cpp.o
 .PHONY : brainfuck/bfmake.o
 
@@ -153,30 +177,6 @@ brainfuck/bfmake.cpp.s:
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/bf_machine.dir/build.make CMakeFiles/bf_machine.dir/brainfuck/bfmake.cpp.s
 .PHONY : brainfuck/bfmake.cpp.s
 
-brainfuck/brainfuck.o: brainfuck/brainfuck.cpp.o
-.PHONY : brainfuck/brainfuck.o
-
-# target to build an object file
-brainfuck/brainfuck.cpp.o:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/bf_machine.dir/build.make CMakeFiles/bf_machine.dir/brainfuck/brainfuck.cpp.o
-.PHONY : brainfuck/brainfuck.cpp.o
-
-brainfuck/brainfuck.i: brainfuck/brainfuck.cpp.i
-.PHONY : brainfuck/brainfuck.i
-
-# target to preprocess a source file
-brainfuck/brainfuck.cpp.i:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/bf_machine.dir/build.make CMakeFiles/bf_machine.dir/brainfuck/brainfuck.cpp.i
-.PHONY : brainfuck/brainfuck.cpp.i
-
-brainfuck/brainfuck.s: brainfuck/brainfuck.cpp.s
-.PHONY : brainfuck/brainfuck.s
-
-# target to generate assembly for a file
-brainfuck/brainfuck.cpp.s:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/bf_machine.dir/build.make CMakeFiles/bf_machine.dir/brainfuck/brainfuck.cpp.s
-.PHONY : brainfuck/brainfuck.cpp.s
-
 # Help Target
 help:
 	@echo "The following are some of the valid targets for this Makefile:"
@@ -186,12 +186,12 @@ help:
 	@echo "... edit_cache"
 	@echo "... rebuild_cache"
 	@echo "... bf_machine"
+	@echo "... brainfuck/bfmachine.o"
+	@echo "... brainfuck/bfmachine.i"
+	@echo "... brainfuck/bfmachine.s"
 	@echo "... brainfuck/bfmake.o"
 	@echo "... brainfuck/bfmake.i"
 	@echo "... brainfuck/bfmake.s"
-	@echo "... brainfuck/brainfuck.o"
-	@echo "... brainfuck/brainfuck.i"
-	@echo "... brainfuck/brainfuck.s"
 .PHONY : help
 
 

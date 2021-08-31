@@ -72,10 +72,11 @@ public:
 class blc : public cmd
 {
 private:
-    cmd * elc;
+
 public:
     blc( std::shared_ptr<int> head, char *buf, int am);
-
+//TODO
+    cmd * elc;
     void set_elc(cmd * elc_);
     void fn() override;
 };
@@ -83,10 +84,11 @@ public:
 class elc : public cmd
 {
 private:
-    cmd * blc;
+
 public:
     elc( std::shared_ptr<int> head, char *buf, int am);
-
+//TODO
+    cmd * blc;
     void set_blc(cmd * blc_);
     void fn() override;
 };
