@@ -1,0 +1,3 @@
+/home/theredrover/projects/c++/bf_machine/cmake-build-debug/CMakeFiles/rebuild_cache.dir
+/home/theredrover/projects/c++/bf_machine/cmake-build-debug/CMakeFiles/edit_cache.dir
+/home/theredrover/projects/c++/bf_machine/cmake-build-debug/CMakeFiles/bf_machine.dir

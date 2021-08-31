@@ -1,0 +1,1 @@
+/usr/bin/c++ -g CMakeFiles/bf_machine.dir/brainfuck/bfmake.cpp.o CMakeFiles/bf_machine.dir/brainfuck/brainfuck.cpp.o -o bf_machine 
