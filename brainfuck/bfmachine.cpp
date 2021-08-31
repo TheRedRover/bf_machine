@@ -189,3 +189,8 @@ void bfmachine::execute()
     if(first_cmd)
         first_cmd->fn();
 }
+
+bfmachine::bfmachine()
+{
+    cpu_first = cpu;
+}

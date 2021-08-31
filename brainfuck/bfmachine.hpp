@@ -65,7 +65,7 @@ public:
 class blc : public cmd
 {
 private:
-    cmd * elc;
+    cmd * elc = nullptr;
 public:
     blc( std::shared_ptr<int> head, char *buf, int am);
     void set_elc(cmd * elc_);
@@ -75,7 +75,7 @@ public:
 class elc : public cmd
 {
 private:
-    cmd * blc;
+    cmd * blc = nullptr;
 public:
     elc( std::shared_ptr<int> head, char *buf, int am);
     void set_blc(cmd * blc_);
@@ -92,14 +92,19 @@ public:
 class bfmachine
 {
 private:
+public:
+    bfmachine();
+
+private:
     std::unique_ptr<cmd> first_cmd;
     int head=0;
     static std::vector<std::pair<char, size_t>> s_to_ps( const std::string & str);
+    char cpu[BUF_SIZE] = {0};
 
 public:
-    char cpu[BUF_SIZE] = {0};
-    char * cpu_first = cpu;
+    char * cpu_first;
     void init( const std::string & str);
     void execute();
+
 };
 #endif //BF_MACHINE_BFMACHINE_HPP
