@@ -1,5 +1,4 @@
 ![build](https://github.com/TheRedRover/brainfuck/actions/workflows/c-cpp.yml/badge.svg?branch=master)
-
 ![build](https://github.com/TheRedRover/brainfuck/actions/workflows/test.yml/badge.svg?branch=master)
 
 # Simple brainfuck compiler
