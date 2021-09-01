@@ -139,15 +139,15 @@ void bfmachine::init(std::string str)
     used = false;
     std::shared_ptr<int> head_ptr = std::make_shared<int>(head);
     *head_ptr = 0;
-    for(auto i = 0; i<BUF_SIZE;++i)
+    for (auto i = 0; i < BUF_SIZE; ++i)
     {
-        cpu[i]=0;
+        cpu[i] = 0;
     }
     std::stack<blc *> stack;
     auto ps = s_to_ps(str);
     cmd *current_ptr;
-    if(first_cmd.get())
-        first_cmd=std::move(first_cmd);
+    if (first_cmd.get())
+        first_cmd = std::move(first_cmd);
     else
         first_cmd = std::make_unique<cmd>(cmd(head_ptr, cpu_first, 1));
     current_ptr = first_cmd.get();
@@ -210,7 +210,7 @@ void bfmachine::init(std::string str)
 
 void bfmachine::execute()
 {
-    if(used)
+    if (used)
         throw std::logic_error("You should reinit your bfmachine before next execution");
     used = true;
     if (first_cmd && first_cmd->get_nxt() != nullptr)
