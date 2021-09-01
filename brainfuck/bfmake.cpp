@@ -23,6 +23,7 @@ int main(int argc, char *argv[])
                 std::string str((std::istreambuf_iterator<char>(f)), std::istreambuf_iterator<char>());
                 c.init(str);
                 c.execute();
+
             }
             break;
         }

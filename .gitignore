@@ -3,3 +3,5 @@ cmake-build-debug/
 bin/
 build/
 .idea/
+.vscode/
+test/test

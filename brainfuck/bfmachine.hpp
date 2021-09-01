@@ -99,12 +99,13 @@ class bfmachine
   private:
     std::unique_ptr<cmd> first_cmd;
     int head = 0;
-    static std::vector<std::pair<char, size_t>> s_to_ps(const std::string &str);
+    static std::vector<std::pair<char, size_t>> s_to_ps(std::string str);
     char cpu[BUF_SIZE] = {0};
+    bool used = false;
 
   public:
     char *cpu_first;
-    void init(const std::string &str);
+    void init(std::string str);
     void execute();
 };
 #endif // BF_MACHINE_BFMACHINE_HPP
