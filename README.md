@@ -1,3 +1,5 @@
+![build](https://github.com/TheRedRover/brainfuck/blob/master/.github/workflows/c-cpp.yml/badge.svg)
+
 # Simple brainfuck compiler
 
 This brainfuck compiler don't support input operator `,` and has restriction in 30000 memory cells (as classic brainfuck).
