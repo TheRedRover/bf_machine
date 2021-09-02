@@ -43,7 +43,7 @@ incc::incc(std::shared_ptr<int> head, char *buf, int am) : cmd(std::move(head), 
 void mvlc::fn()
 {
     if (((*head) -= am) < 0)
-        throw std::logic_error("");
+        throw std::logic_error("An attempt to move head pointer to cell which index is less than zero\n");
     if (nxt_)
         nxt_->fn();
 }
@@ -54,8 +54,8 @@ mvlc::mvlc(std::shared_ptr<int> head, char *buf, int am) : cmd(std::move(head), 
 
 void mvrc::fn()
 {
-    if (((*head) += am) < 0)
-        throw std::logic_error("");
+    if (((*head) += am) >= BUF_SIZE)
+        throw std::logic_error("An attempt to move head pointer to cell which index is more than number of cells\n");
     if (nxt_)
         nxt_->fn();
 }
