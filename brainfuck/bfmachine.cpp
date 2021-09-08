@@ -52,34 +52,38 @@ void move_right_cmd::execute()
 {
     if (((*head) += am) >= BUF_SIZE)
         throw std::logic_error("An attempt to move head pointer to cell which index is more than number of cells\n");
-    if(*head>=buf->size())
+    if (*head >= buf->size())
     {
-        while (buf->size()<=*head)
+        while (buf->size() <= *head)
             buf->push_back(0);
     }
     cmd::execute();
 }
 
-move_right_cmd::move_right_cmd(std::shared_ptr<int> head, std::vector<char> *buf, int am) : cmd(std::move(head), buf, am)
+move_right_cmd::move_right_cmd(std::shared_ptr<int> head, std::vector<char> *buf, int am)
+    : cmd(std::move(head), buf, am)
 {
 }
 
-loop_cmd::loop_cmd(const std::shared_ptr<int> &head, std::vector<char> *buf, int am) : cmd(head, buf, am) {}
+loop_cmd::loop_cmd(const std::shared_ptr<int> &head, std::vector<char> *buf, int am) : cmd(head, buf, am)
+{
+}
 
 void loop_cmd::execute()
 {
-    while (buf->at(*head)!=0)
+    while (buf->at(*head) != 0)
     {
-        if(first_inner_cmd)
+        if (first_inner_cmd)
             first_inner_cmd->execute();
     }
-    if(next_cmd)
+    if (next_cmd)
         next_cmd->execute();
-
 }
 
-void loop_cmd::set_next_cmd(std::unique_ptr<cmd> nxt) {
-    if(inner_cmd){
+void loop_cmd::set_next_cmd(std::unique_ptr<cmd> nxt)
+{
+    if (inner_cmd)
+    {
         next_cmd = std::move(nxt);
     }
     else
@@ -89,21 +93,26 @@ void loop_cmd::set_next_cmd(std::unique_ptr<cmd> nxt) {
     }
 }
 
-void loop_cmd::set_inner_cmd_flag(bool val) {
+void loop_cmd::set_inner_cmd_flag(bool val)
+{
     inner_cmd = val;
 }
 
-cmd *loop_cmd::get_next_cmd() {
-    if(inner_next){
+cmd *loop_cmd::get_next_cmd()
+{
+    if (inner_next)
+    {
         return next_cmd.get();
     }
-    else{
+    else
+    {
         inner_next = true;
         return first_inner_cmd.get();
     }
 }
 
-void loop_cmd::set_inner_next_flag(bool val) {
+void loop_cmd::set_inner_next_flag(bool val)
+{
     inner_next = val;
 }
 
@@ -177,8 +186,7 @@ void bfmachine::init(std::string str)
             current_ptr = current_ptr->get_next_cmd();
             break;
         }
-        case LEFT_BRACKET:
-        {
+        case LEFT_BRACKET: {
 
             auto blc_ = std::make_unique<loop_cmd>(head_ptr, &memory_cells, 1);
             stack.push(blc_.get());
@@ -187,7 +195,8 @@ void bfmachine::init(std::string str)
             break;
         }
         case RIGHT_BRACKET: {
-            if(current_ptr==stack.top()) {
+            if (current_ptr == stack.top())
+            {
                 stack.top()->set_inner_cmd_flag(true);
                 stack.top()->set_inner_next_flag(true);
             }
@@ -222,4 +231,3 @@ void bfmachine::run()
 bfmachine::bfmachine()
 {
 }
-
