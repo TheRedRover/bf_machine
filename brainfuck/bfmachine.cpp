@@ -2,119 +2,123 @@
 #include <stack>
 #include <utility>
 
-void cmd::nxt(std::unique_ptr<cmd> nxt)
+void cmd::set_next_cmd(std::unique_ptr<cmd> nxt)
 {
-    nxt_ = std::move(nxt);
+    next_cmd = std::move(nxt);
 }
 
-cmd *cmd::get_nxt()
+cmd *cmd::get_next_cmd()
 {
-    return nxt_.get();
+    return next_cmd.get();
 }
 
-void cmd::fn()
+void cmd::execute()
 {
-    if (nxt_)
-        nxt_->fn();
+    if (next_cmd)
+        next_cmd->execute();
 }
 
-void decc::fn()
+void decrement_cmd::execute()
 {
-    buf[*head] -= am;
-    if (nxt_)
-        nxt_->fn();
+    buf->at(*head) -= am;
+    cmd::execute();
 }
-
-decc::decc(std::shared_ptr<int> head, char *buf, int am) : cmd(std::move(head), buf, am)
+decrement_cmd::decrement_cmd(std::shared_ptr<int> head, std::vector<char> *buf, int am) : cmd(std::move(head), buf, am)
 {
 }
 
-void incc::fn()
+void increment_cmd::execute()
 {
-    buf[*head] += am;
-    if (nxt_)
-        nxt_->fn();
+    buf->at(*head) += am;
+    cmd::execute();
 }
 
-incc::incc(std::shared_ptr<int> head, char *buf, int am) : cmd(std::move(head), buf, am)
+increment_cmd::increment_cmd(std::shared_ptr<int> head, std::vector<char> *buf, int am) : cmd(std::move(head), buf, am)
 {
 }
 
-void mvlc::fn()
+void move_left_cmd::execute()
 {
     if (((*head) -= am) < 0)
         throw std::logic_error("An attempt to move head pointer to cell which index is less than zero\n");
-    if (nxt_)
-        nxt_->fn();
+    cmd::execute();
 }
 
-mvlc::mvlc(std::shared_ptr<int> head, char *buf, int am) : cmd(std::move(head), buf, am)
+move_left_cmd::move_left_cmd(std::shared_ptr<int> head, std::vector<char> *buf, int am) : cmd(std::move(head), buf, am)
 {
 }
 
-void mvrc::fn()
+void move_right_cmd::execute()
 {
     if (((*head) += am) >= BUF_SIZE)
         throw std::logic_error("An attempt to move head pointer to cell which index is more than number of cells\n");
-    if (nxt_)
-        nxt_->fn();
-}
-
-mvrc::mvrc(std::shared_ptr<int> head, char *buf, int am) : cmd(std::move(head), buf, am)
-{
-}
-
-void blc::fn()
-{
-    if (buf[*head] == 0)
-        elc->fn();
-    else
-        nxt_->fn();
-}
-
-void blc::set_elc(cmd *elc_)
-{
-    elc = elc_;
-}
-
-blc::blc(std::shared_ptr<int> head, char *buf, int am) : cmd(std::move(head), buf, am)
-{
-}
-
-void elc::fn()
-{
-    if (buf[*head] == 0)
+    if(*head>=buf->size())
     {
-        if (nxt_)
-            nxt_->fn();
+        while (buf->size()<=*head)
+            buf->push_back(0);
+    }
+    cmd::execute();
+}
+
+move_right_cmd::move_right_cmd(std::shared_ptr<int> head, std::vector<char> *buf, int am) : cmd(std::move(head), buf, am)
+{
+}
+
+loop_cmd::loop_cmd(const std::shared_ptr<int> &head, std::vector<char> *buf, int am) : cmd(head, buf, am) {}
+
+void loop_cmd::execute()
+{
+    while (buf->at(*head)!=0)
+    {
+        if(first_inner_cmd)
+            first_inner_cmd->execute();
+    }
+    if(next_cmd)
+        next_cmd->execute();
+
+}
+
+void loop_cmd::set_next_cmd(std::unique_ptr<cmd> nxt) {
+    if(inner_cmd){
+        next_cmd = std::move(nxt);
     }
     else
-        blc->fn();
+    {
+        first_inner_cmd = std::move(nxt);
+        inner_cmd = true;
+    }
 }
 
-void elc::set_blc(cmd *blc_)
-{
-    blc = blc_;
+void loop_cmd::set_inner_cmd_flag(bool val) {
+    inner_cmd = val;
 }
 
-elc::elc(std::shared_ptr<int> head, char *buf, int am) : cmd(std::move(head), buf, am)
-{
+cmd *loop_cmd::get_next_cmd() {
+    if(inner_next){
+        return next_cmd.get();
+    }
+    else{
+        inner_next = true;
+        return first_inner_cmd.get();
+    }
 }
 
-void outc::fn()
-{
+void loop_cmd::set_inner_next_flag(bool val) {
+    inner_next = val;
+}
 
+void out_cmd::execute()
+{
     for (auto i = 0; i < am; ++i)
-        std::cout << buf[*head];
-    if (nxt_)
-        nxt_->fn();
+        std::cout << buf->at(*head);
+    cmd::execute();
 }
 
-outc::outc(std::shared_ptr<int> head, char *buf, int am) : cmd(std::move(head), buf, am)
+out_cmd::out_cmd(std::shared_ptr<int> head, std::vector<char> *buf, int am) : cmd(std::move(head), buf, am)
 {
 }
 
-std::vector<std::pair<char, size_t>> bfmachine::s_to_ps(std::string str)
+std::vector<std::pair<char, size_t>> bfmachine::string_to_char_pairs(std::string str)
 {
     if (str.empty())
         throw std::invalid_argument("Code string is empty");
@@ -139,63 +143,61 @@ void bfmachine::init(std::string str)
     used = false;
     std::shared_ptr<int> head_ptr = std::make_shared<int>(head);
     *head_ptr = 0;
-    for (auto i = 0; i < BUF_SIZE; ++i)
-    {
-        cpu[i] = 0;
-    }
-    std::stack<blc *> stack;
-    auto ps = s_to_ps(str);
+    memory_cells.clear();
+    memory_cells.push_back(0);
+    std::stack<loop_cmd *> stack;
+    auto ps = string_to_char_pairs(str);
     cmd *current_ptr;
-    if (first_cmd.get())
+    if (first_cmd)
         first_cmd = std::move(first_cmd);
     else
-        first_cmd = std::make_unique<cmd>(cmd(head_ptr, cpu_first, 1));
+        first_cmd = std::make_unique<cmd>(cmd(head_ptr, &memory_cells, 1));
     current_ptr = first_cmd.get();
     for (auto p : ps)
     {
         switch (p.first)
         {
         case MINUS: {
-            current_ptr->nxt(std::make_unique<decc>(head_ptr, cpu_first, p.second));
-            current_ptr = current_ptr->get_nxt();
+            current_ptr->set_next_cmd(std::make_unique<decrement_cmd>(head_ptr, &memory_cells, p.second));
+            current_ptr = current_ptr->get_next_cmd();
             break;
         }
         case PLUS: {
-            current_ptr->nxt(std::make_unique<incc>(head_ptr, cpu_first, p.second));
-            current_ptr = current_ptr->get_nxt();
+            current_ptr->set_next_cmd(std::make_unique<increment_cmd>(head_ptr, &memory_cells, p.second));
+            current_ptr = current_ptr->get_next_cmd();
             break;
         }
         case LEFT: {
-            current_ptr->nxt(std::make_unique<mvlc>(head_ptr, cpu_first, p.second));
-            current_ptr = current_ptr->get_nxt();
+            current_ptr->set_next_cmd(std::make_unique<move_left_cmd>(head_ptr, &memory_cells, p.second));
+            current_ptr = current_ptr->get_next_cmd();
             break;
         }
         case RIGHT: {
-            current_ptr->nxt(std::make_unique<mvrc>(head_ptr, cpu_first, p.second));
-            current_ptr = current_ptr->get_nxt();
+            current_ptr->set_next_cmd(std::make_unique<move_right_cmd>(head_ptr, &memory_cells, p.second));
+            current_ptr = current_ptr->get_next_cmd();
             break;
         }
-        case LEFT_BRACKET: {
-            auto blc_ = std::make_unique<blc>(head_ptr, cpu_first, p.second);
+        case LEFT_BRACKET:
+        {
+
+            auto blc_ = std::make_unique<loop_cmd>(head_ptr, &memory_cells, 1);
             stack.push(blc_.get());
-            current_ptr->nxt(std::move(blc_));
-            current_ptr = current_ptr->get_nxt();
+            current_ptr->set_next_cmd(std::move(blc_));
+            current_ptr = current_ptr->get_next_cmd();
             break;
         }
         case RIGHT_BRACKET: {
-            if (stack.empty())
-                throw std::logic_error("Left bracket '[' is missing");
-            auto elc_ = std::make_unique<elc>(head_ptr, cpu_first, p.second);
-            stack.top()->set_elc(elc_.get());
-            elc_->set_blc(stack.top());
-            current_ptr->nxt(std::move(elc_));
-            current_ptr = current_ptr->get_nxt();
+            if(current_ptr==stack.top()) {
+                stack.top()->set_inner_cmd_flag(true);
+                stack.top()->set_inner_next_flag(true);
+            }
+            current_ptr = stack.top();
             stack.pop();
             break;
         }
         case POINT: {
-            current_ptr->nxt(std::make_unique<outc>(head_ptr, cpu_first, p.second));
-            current_ptr = current_ptr->get_nxt();
+            current_ptr->set_next_cmd(std::make_unique<out_cmd>(head_ptr, &memory_cells, p.second));
+            current_ptr = current_ptr->get_next_cmd();
             break;
         }
         default:
@@ -208,16 +210,16 @@ void bfmachine::init(std::string str)
         throw std::logic_error("There isn't brainfuck code in string/file\n");
 }
 
-void bfmachine::execute()
+void bfmachine::run()
 {
     if (used)
         throw std::logic_error("You should reinit your bfmachine before next execution");
     used = true;
-    if (first_cmd && first_cmd->get_nxt() != nullptr)
-        first_cmd->fn();
+    if (first_cmd && first_cmd->get_next_cmd() != nullptr)
+        first_cmd->execute();
 }
 
 bfmachine::bfmachine()
 {
-    cpu_first = cpu;
 }
+

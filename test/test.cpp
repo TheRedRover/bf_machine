@@ -9,7 +9,7 @@ std::string get_cout_string(bfmachine &c)
 {
     std::stringstream buffer;
     std::streambuf *prevcoutbuf = std::cout.rdbuf(buffer.rdbuf());
-    c.execute();
+    c.run();
     std::cout.rdbuf(prevcoutbuf);
     std::string text = buffer.str();
     return text;

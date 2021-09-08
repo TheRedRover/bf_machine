@@ -21,73 +21,66 @@ const size_t BUF_SIZE = 30000;
 class cmd
 {
   public:
-    cmd(std::shared_ptr<int> head_, char *buf_, int am_) : head(std::move(head_)), buf(buf_), am(am_){};
-    void nxt(std::unique_ptr<cmd>);
-    cmd *get_nxt();
-    virtual void fn();
+    cmd(std::shared_ptr<int> head_, std::vector<char> *buf_, int am_) : head(std::move(head_)), buf(buf_), am(am_){};
+    virtual void set_next_cmd(std::unique_ptr<cmd>);
+    virtual cmd *get_next_cmd();
+    virtual void execute();
 
   protected:
-    std::unique_ptr<cmd> nxt_;
+    std::unique_ptr<cmd> next_cmd;
     std::shared_ptr<int> head;
-    char *buf;
+    std::vector<char> * buf;
     int am = 0;
 };
 
-class decc : public cmd
+class decrement_cmd : public cmd
 {
   public:
-    decc(std::shared_ptr<int> head, char *buf, int am);
-    void fn() override;
+    decrement_cmd(std::shared_ptr<int> head, std::vector<char> *buf, int am);
+    void execute() override;
 };
 
-class incc : public cmd
+class increment_cmd : public cmd
 {
   public:
-    void fn() override;
-    incc(std::shared_ptr<int> head, char *buf, int am);
+    void execute() override;
+    increment_cmd(std::shared_ptr<int> head, std::vector<char> *buf, int am);
 };
 
-class mvlc : public cmd
+class move_left_cmd : public cmd
 {
   public:
-    mvlc(std::shared_ptr<int> head, char *buf, int am);
-    void fn() override;
+    move_left_cmd(std::shared_ptr<int> head, std::vector<char> *buf, int am);
+    void execute() override;
 };
 
-class mvrc : public cmd
+class move_right_cmd : public cmd
 {
   public:
-    mvrc(std::shared_ptr<int> head, char *buf, int am);
-    void fn() override;
+    move_right_cmd(std::shared_ptr<int> head, std::vector<char> *buf, int am);
+    void execute() override;
 };
 
-class blc : public cmd
+class loop_cmd : public cmd
 {
-  private:
-    cmd *elc = nullptr;
-
-  public:
-    blc(std::shared_ptr<int> head, char *buf, int am);
-    void set_elc(cmd *elc_);
-    void fn() override;
+private:
+    bool inner_cmd = false;
+    bool inner_next = false;
+    std::unique_ptr<cmd> first_inner_cmd;
+public:
+    void set_inner_cmd_flag(bool val);
+    void set_inner_next_flag(bool val);
+    loop_cmd(const std::shared_ptr<int> &head, std::vector<char> *buf, int am);
+    void set_next_cmd(std::unique_ptr<cmd>) override;
+    cmd *get_next_cmd() override;
+    void execute() override;
 };
 
-class elc : public cmd
-{
-  private:
-    cmd *blc = nullptr;
-
-  public:
-    elc(std::shared_ptr<int> head, char *buf, int am);
-    void set_blc(cmd *blc_);
-    void fn() override;
-};
-
-class outc : public cmd
+class out_cmd : public cmd
 {
   public:
-    outc(std::shared_ptr<int> head, char *buf, int am);
-    void fn() override;
+    out_cmd(std::shared_ptr<int> head, std::vector<char> *buf, int am);
+    void execute() override;
 };
 
 class bfmachine
@@ -99,13 +92,12 @@ class bfmachine
   private:
     std::unique_ptr<cmd> first_cmd;
     int head = 0;
-    static std::vector<std::pair<char, size_t>> s_to_ps(std::string str);
-    char cpu[BUF_SIZE] = {0};
+    static std::vector<std::pair<char, size_t>> string_to_char_pairs(std::string str);
+    std::vector<char> memory_cells;
     bool used = false;
 
   public:
-    char *cpu_first;
     void init(std::string str);
-    void execute();
+    void run();
 };
 #endif // BF_MACHINE_BFMACHINE_HPP

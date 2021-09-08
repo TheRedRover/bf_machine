@@ -10,7 +10,7 @@ int main(int argc, char *argv[])
         {
         case 2: {
             c.init(argv[1]);
-            c.execute();
+            c.run();
             break;
         }
         case 3: {
@@ -22,7 +22,7 @@ int main(int argc, char *argv[])
                     throw std::invalid_argument("Such file doesn't exist\n");
                 std::string str((std::istreambuf_iterator<char>(f)), std::istreambuf_iterator<char>());
                 c.init(str);
-                c.execute();
+                c.run();
             }
             break;
         }
