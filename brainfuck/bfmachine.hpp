@@ -2,8 +2,8 @@
 #define BF_MACHINE_BFMACHINE_HPP
 #include <iostream>
 #include <memory>
-#include <vector>
 #include <variant>
+#include <vector>
 
 enum commands
 {
@@ -93,7 +93,7 @@ class bfmachine
     static std::vector<std::pair<char, size_t>> string_to_char_pairs(std::string str);
     std::vector<char> memory_cells;
     bool used = false;
-    void create_cmds(std::string & str);
+    void create_cmds(std::string &str);
 
   public:
     void init(std::string str);
