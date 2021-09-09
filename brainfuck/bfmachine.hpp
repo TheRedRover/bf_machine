@@ -3,6 +3,7 @@
 #include <iostream>
 #include <memory>
 #include <vector>
+#include <variant>
 
 enum commands
 {
@@ -86,15 +87,12 @@ class out_cmd : public cmd
 class bfmachine
 {
   private:
-  public:
-    bfmachine();
-
-  private:
     std::unique_ptr<cmd> first_cmd;
     int head = 0;
     static std::vector<std::pair<char, size_t>> string_to_char_pairs(std::string str);
     std::vector<char> memory_cells;
     bool used = false;
+    void create_cmds(std::string & str);
 
   public:
     void init(std::string str);

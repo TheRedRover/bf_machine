@@ -141,73 +141,12 @@ std::vector<std::pair<char, size_t>> bfmachine::string_to_char_pairs(std::string
 void bfmachine::init(std::string str)
 {
     used = false;
-    std::shared_ptr<int> head_ptr = std::make_shared<int>(head);
-    *head_ptr = 0;
     memory_cells.clear();
     memory_cells.push_back(0);
-    std::stack<loop_cmd *> stack;
-    auto ps = string_to_char_pairs(str);
-    cmd *current_ptr;
-    if (first_cmd)
-        first_cmd = std::move(first_cmd);
-    else
-        first_cmd = std::make_unique<cmd>(cmd(head_ptr, &memory_cells, 1));
-    current_ptr = first_cmd.get();
-    for (auto p : ps)
-    {
-        switch (p.first)
-        {
-        case MINUS: {
-            current_ptr->set_next_cmd(std::make_unique<decrement_cmd>(head_ptr, &memory_cells, p.second));
-            current_ptr = current_ptr->get_next_cmd();
-            break;
-        }
-        case PLUS: {
-            current_ptr->set_next_cmd(std::make_unique<increment_cmd>(head_ptr, &memory_cells, p.second));
-            current_ptr = current_ptr->get_next_cmd();
-            break;
-        }
-        case LEFT: {
-            current_ptr->set_next_cmd(std::make_unique<move_left_cmd>(head_ptr, &memory_cells, p.second));
-            current_ptr = current_ptr->get_next_cmd();
-            break;
-        }
-        case RIGHT: {
-            current_ptr->set_next_cmd(std::make_unique<move_right_cmd>(head_ptr, &memory_cells, p.second));
-            current_ptr = current_ptr->get_next_cmd();
-            break;
-        }
-        case LEFT_BRACKET:
-        {
+    create_cmds(str);
 
-            auto blc_ = std::make_unique<loop_cmd>(head_ptr, &memory_cells, 1);
-            stack.push(blc_.get());
-            current_ptr->set_next_cmd(std::move(blc_));
-            current_ptr = current_ptr->get_next_cmd();
-            break;
-        }
-        case RIGHT_BRACKET: {
-            if(current_ptr==stack.top()) {
-                stack.top()->set_inner_cmd_flag(true);
-                stack.top()->set_inner_next_flag(true);
-            }
-            current_ptr = stack.top();
-            stack.pop();
-            break;
-        }
-        case POINT: {
-            current_ptr->set_next_cmd(std::make_unique<out_cmd>(head_ptr, &memory_cells, p.second));
-            current_ptr = current_ptr->get_next_cmd();
-            break;
-        }
-        default:
-            break;
-        }
-    }
-    if (!stack.empty())
-        throw std::logic_error("Right bracket ']' is missing\n");
-    if (current_ptr == first_cmd.get())
-        throw std::logic_error("There isn't brainfuck code in string/file\n");
+
+
 }
 
 void bfmachine::run()
@@ -219,7 +158,72 @@ void bfmachine::run()
         first_cmd->execute();
 }
 
-bfmachine::bfmachine()
-{
+void bfmachine::create_cmds(std::string &str) {
+    auto ps = string_to_char_pairs(str);
+    std::stack<loop_cmd *> stack;
+    std::shared_ptr<int> head_ptr = std::make_shared<int>(head);
+    *head_ptr = 0;
+    cmd *current_ptr;
+    if (!first_cmd)
+        first_cmd = std::make_unique<cmd>(cmd(head_ptr, &memory_cells, 1));
+    current_ptr = first_cmd.get();
+    for (auto p : ps)
+    {
+        switch (p.first)
+        {
+            case MINUS: {
+                current_ptr->set_next_cmd(std::make_unique<decrement_cmd>(head_ptr, &memory_cells, p.second));
+                current_ptr = current_ptr->get_next_cmd();
+                break;
+            }
+            case PLUS: {
+                current_ptr->set_next_cmd(std::make_unique<increment_cmd>(head_ptr, &memory_cells, p.second));
+                current_ptr = current_ptr->get_next_cmd();
+                break;
+            }
+            case LEFT: {
+                current_ptr->set_next_cmd(std::make_unique<move_left_cmd>(head_ptr, &memory_cells, p.second));
+                current_ptr = current_ptr->get_next_cmd();
+                break;
+            }
+            case RIGHT: {
+                current_ptr->set_next_cmd(std::make_unique<move_right_cmd>(head_ptr, &memory_cells, p.second));
+                current_ptr = current_ptr->get_next_cmd();
+                break;
+            }
+            case LEFT_BRACKET:
+            {
+
+                auto blc_ = std::make_unique<loop_cmd>(head_ptr, &memory_cells, 1);
+                stack.push(blc_.get());
+                current_ptr->set_next_cmd(std::move(blc_));
+                current_ptr = current_ptr->get_next_cmd();
+                break;
+            }
+            case RIGHT_BRACKET: {
+                if(stack.empty())
+                    throw std::logic_error("Left bracket '[' is missing\n");
+                if(current_ptr==stack.top()) {
+                    stack.top()->set_inner_cmd_flag(true);
+                    stack.top()->set_inner_next_flag(true);
+                }
+                current_ptr = stack.top();
+                stack.pop();
+                break;
+            }
+            case POINT: {
+                current_ptr->set_next_cmd(std::make_unique<out_cmd>(head_ptr, &memory_cells, p.second));
+                current_ptr = current_ptr->get_next_cmd();
+                break;
+            }
+            default:
+                break;
+        }
+    }
+    if (!stack.empty())
+        throw std::logic_error("Right bracket ']' is missing\n");
+    if (current_ptr == first_cmd.get())
+        throw std::logic_error("There isn't brainfuck code in string/file\n");
 }
+
 
