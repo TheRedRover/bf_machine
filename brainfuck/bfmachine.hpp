@@ -30,7 +30,7 @@ class cmd
   protected:
     std::unique_ptr<cmd> next_cmd;
     std::shared_ptr<int> head;
-    std::vector<char> * buf;
+    std::vector<char> *buf;
     int am = 0;
 };
 
@@ -64,11 +64,12 @@ class move_right_cmd : public cmd
 
 class loop_cmd : public cmd
 {
-private:
+  private:
     bool inner_cmd = false;
     bool inner_next = false;
     std::unique_ptr<cmd> first_inner_cmd;
-public:
+
+  public:
     void set_inner_cmd_flag(bool val);
     void set_inner_next_flag(bool val);
     loop_cmd(const std::shared_ptr<int> &head, std::vector<char> *buf, int am);
