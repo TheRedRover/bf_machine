@@ -21,12 +21,10 @@ command_types cmd::get_cmd_type() {
     return c;
 }
 
-cmd::~cmd()
-{
-    delete _next;
+cmd::~cmd() {
 }
 
-cmd *cmd::get_constr_next() {
+cmd *cmd::get_clear_next() {
     return _next;
 }
 
@@ -98,45 +96,42 @@ command_types out_cmd::get_cmd_type() {
 loop_cmd::loop_cmd(int am) : cmd(am) {
 }
 
-
-loop_cmd::~loop_cmd()
-{
-    delete after_loop_next;
-    delete inner_next;
-}
-
 int loop_cmd::execute(int cell_value) {
-    if(cell_value==0) {
-        std::cout<<"After_loop\n";
-        _next = after_loop_next;
-    }
-    else {
-        std::cout<<"Into loop\n";
-        _next = inner_next;
-    }
+    if(cell_value==0)
+        inner_flag = false;
+    else inner_flag = true;
+    return 0;
 }
 
-command_types loop_cmd::get_cmd_type() {
-    return c;
+cmd *loop_cmd::get_next() {
+    if(inner_flag)
+        return inner_next;
+    else return _next;
+}
+
+void loop_cmd::set_flag(bool par) {
+    inner_flag = par;
 }
 
 void loop_cmd::set_next(cmd * next) {
-    if(inner_next!=nullptr) {
-        std::cerr<<"AFTER\n";
-        after_loop_next = next;
-    }
-    else {
-        std::cerr<<"INNER\n";
+    if(inner_flag) {
         inner_next = next;
     }
-
+    else
+    {
+        _next = next;
+    }
 }
 
-cmd *loop_cmd::get_constr_next() {
-    if(inner_next_flag)
-        return after_loop_next;
-    else
-        return inner_next;
+loop_cmd::~loop_cmd() {
+
+    cmd * ptr = this->inner_next;
+    while(ptr->get_next()!=this)
+    {
+        auto temp = ptr;
+        ptr = temp->get_next();
+        delete temp;
+    }
 }
 
 
@@ -177,74 +172,44 @@ void bfmachine::init(std::string str)
         switch (p.first)
         {
             case MINUS: {
-                if(current_cmd)
-                    std::cerr<<(char)current_cmd->get_cmd_type();
                 current_cmd->set_next(new decrement_cmd(p.second));
-                current_cmd = current_cmd->get_constr_next();
-                if(current_cmd)
-                    std::cerr<<(char)current_cmd->get_cmd_type()<<"\n";
+                current_cmd = current_cmd->get_next();
                 break;
             }
             case PLUS: {
-                if(current_cmd)
-                    std::cerr<<(char)current_cmd->get_cmd_type();
                 current_cmd->set_next(new increment_cmd(p.second));
-                current_cmd = current_cmd->get_constr_next();
-                if(current_cmd)
-                    std::cerr<<(char)current_cmd->get_cmd_type()<<"\n";
+                current_cmd = current_cmd->get_next();
                 break;
             }
             case LEFT: {
-                if(current_cmd)
-                    std::cerr<<(char)current_cmd->get_cmd_type();
                 current_cmd->set_next(new move_left_cmd(p.second));
-                current_cmd = current_cmd->get_constr_next();
-                if(current_cmd)
-                    std::cerr<<(char)current_cmd->get_cmd_type()<<"\n";
+                current_cmd = current_cmd->get_next();
                 break;
             }
             case RIGHT: {
-                if(current_cmd)
-                    std::cerr<<(char)current_cmd->get_cmd_type();
                 current_cmd->set_next(new move_right_cmd(p.second));
-                current_cmd = current_cmd->get_constr_next();
-                if(current_cmd)
-                    std::cerr<<(char)current_cmd->get_cmd_type()<<"\n";
+                current_cmd = current_cmd->get_next();
                 break;
-            }
-            case LEFT_BRACKET: {
-                if(current_cmd)
-                    std::cerr<<(char)current_cmd->get_cmd_type();
-                auto lp_cmd = new loop_cmd(1);
-                stack.push(lp_cmd);
-                current_cmd->set_next(lp_cmd);
-                current_cmd = current_cmd->get_constr_next();
-                if(current_cmd)
-                    std::cerr<<(char)current_cmd->get_cmd_type()<<"\n";
-                break;
-            }
-            case RIGHT_BRACKET: {
-                if(current_cmd)
-                    std::cerr<<(char)current_cmd->get_cmd_type();
-
-                current_cmd->set_next(stack.top());
-
-                current_cmd = stack.top();
-
-                stack.pop();
-                if(current_cmd)
-                    std::cerr<<(char)current_cmd->get_cmd_type()<<"\n";
-                break;
-
             }
             case POINT: {
-                if(current_cmd)
-                    std::cerr<<(char)current_cmd->get_cmd_type()<<"\n";
                 current_cmd->set_next(new out_cmd(p.second));
-
-                current_cmd = current_cmd->get_constr_next();
-                if(current_cmd)
-                    std::cerr<<(char)current_cmd->get_cmd_type()<<"\n";
+                current_cmd = current_cmd->get_next();
+                break;
+            }
+            case LEFT_BRACKET:
+            {
+                stack.push(new loop_cmd(1));
+                current_cmd->set_next(stack.top());
+                current_cmd = current_cmd->get_next();
+                stack.top()->set_flag(true);
+                break;
+            }
+            case RIGHT_BRACKET:
+            {
+                current_cmd->set_next(stack.top());
+                stack.top()->set_flag(false);
+                current_cmd = stack.top();
+                stack.pop();
                 break;
             }
             default:
@@ -259,8 +224,13 @@ void bfmachine::init(std::string str)
 
 bfmachine::~bfmachine()
 {
-    delete first_cmd;
-
+    auto ptr = first_cmd;
+    while (ptr)
+    {
+        auto temp = ptr;
+        ptr = ptr->get_clear_next();
+        delete temp;
+    }
 }
 
 void bfmachine::run()
@@ -271,8 +241,11 @@ void bfmachine::run()
     while(ptr)
     {
         runtime_dispatch(ptr->get_cmd_type(),ptr->execute(cells[head]));
-        ptr = ptr->get_next();
+        if(!ptr->get_next())
+            ptr = nullptr;
+        else ptr = ptr->get_next();
     }
+    used = true;
 }
 
 template<command_types c>
@@ -285,15 +258,15 @@ void bfmachine::change_state(int param)
     if constexpr (c==MOVE_HEAD) {
         if (head + param > BUF_SIZE || head + param < 0) {
             throw std::out_of_range("Head pointer out of cells range\n");
-        } else if ((head += param) > cells.size()) {
-            while (cells.size() < head+1)
-                cells.push_back(0);
         }
+        while (cells.size() <= head+param+1)
+            cells.push_back(0);
+        head+=param;
     }
     if constexpr (c==OUT)
     {
         for (auto i = 0; i < param; ++i)
-            std::cout << cells[head];
+            std::cout<< cells[head];
     }
     if constexpr (c==LOOP)
     {
@@ -306,8 +279,6 @@ void bfmachine::runtime_dispatch(command_types c, int param) {
     if ( c == LOOP ) { change_state<LOOP>(param); }
     if ( c == OUT ) { change_state<OUT>(param); }
 }
-
-
 
 
 

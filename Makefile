@@ -1,6 +1,5 @@
-
 CXX		= g++
-CXXFLAGS	= -std=c++17 -O2 -Wall
+CXXFLAGS	= -std=c++17
 
 ODIR		= ./build
 BDIR		= ./bin

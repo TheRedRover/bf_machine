@@ -33,15 +33,15 @@ class cmd
 
   public:
     cmd(int am_) :am(am_){};
+    cmd * get_clear_next();
     virtual void set_next(cmd  * next);
     virtual cmd *get_next();
-    virtual cmd * get_constr_next();
     virtual int execute(int cell_value);
     virtual command_types get_cmd_type();
     virtual ~cmd();
   protected:
     command_types c = START;
-    cmd* _next;
+    cmd* _next = nullptr;
     int am = 0;
 };
 
@@ -83,19 +83,16 @@ class move_right_cmd : public cmd
 
 class loop_cmd : public cmd
 {
-private:
+    bool inner_flag = true;
     command_types c = LOOP;
-    bool inner_next_flag = false;
     cmd * inner_next = nullptr;
-    cmd * after_loop_next = nullptr;
 public:
-    loop_cmd( int am);
+    ~loop_cmd();
+    void set_flag(bool par);
+    loop_cmd(int am);
     void set_next(cmd * next) override;
     int execute(int cell_value) override;
-    cmd * get_constr_next() override;
-    command_types get_cmd_type() override;
-    ~loop_cmd() override;
-    
+    cmd * get_next() override;
 };
 
 class out_cmd : public cmd
@@ -110,10 +107,10 @@ class out_cmd : public cmd
 class bfmachine
 {
   private:
-    cmd * first_cmd;
+    cmd * first_cmd = nullptr;
     std::vector<char> cells;
     int head=0;
-    bool used;
+    bool used = false;
 public:
     void init(std::string str);
     std::vector<std::pair<char, size_t>> s_to_ps(std::string str);
