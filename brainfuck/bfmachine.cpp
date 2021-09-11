@@ -135,20 +135,19 @@ loop_cmd::~loop_cmd() {
 }
 
 
-std::vector<std::pair<char, size_t>> bfmachine::s_to_ps(std::string str)
+std::vector<std::pair<char, size_t>> bfmachine::string_to_pairs(std::string str)
 {
     if (str.empty())
         throw std::invalid_argument("Code string is empty");
 
     std::vector<std::pair<char, size_t>> sps;
     size_t c = 1;
-    for (auto i = ++str.begin(); i != ++str.end(); ++i)
-    {
-        if ((*i) == *(i - 1) && (*i) != LEFT_BRACKET && (*i) != RIGHT_BRACKET)
+    for(std::string::iterator iter=str.begin(); iter!=str.end(); ++iter) {
+        if (*iter == *(std::next(iter))&&*iter!=LEFT_BRACKET&&*iter!=RIGHT_BRACKET) {
             ++c;
-        else
+        } else
         {
-            sps.emplace_back(*(i - 1), c);
+            sps.emplace_back(*iter, c);
             c = 1;
         }
     }
@@ -165,7 +164,7 @@ void bfmachine::init(std::string str)
     first_cmd = new cmd(1);
     cmd * current_cmd = first_cmd;
     std::stack<loop_cmd *> stack;
-    auto ps = s_to_ps(str);
+    auto ps = string_to_pairs(str);
 
     for (auto p : ps)
     {

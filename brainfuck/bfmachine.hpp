@@ -113,7 +113,7 @@ class bfmachine
     bool used = false;
 public:
     void init(std::string str);
-    std::vector<std::pair<char, size_t>> s_to_ps(std::string str);
+    std::vector<std::pair<char, size_t>> string_to_pairs(std::string str);
     template<command_types c>
     void change_state(int param);
     void run();
