@@ -15,7 +15,7 @@ To run compiler with string use comand ` ./bfmachine "your_code" `
 To run compiler with file use flag `-f` like that `./bfmachine -f "way_to_your_file"`
 
 
-### Usage example
+### Usage examples
 
 `./bin/bfmachine "++++++++[>++++[>++>+++>+++>+<<<<-]>+>+>->>+[<]<-]>>.>---.+++ ++++..+++.>>.<-.<.+++.------.--------.>>+.>++."`
 
