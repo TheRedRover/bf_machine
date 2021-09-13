@@ -157,7 +157,7 @@ loop_cmd::~loop_cmd()
 std::vector<std::pair<char, size_t>> bfmachine::string_to_pairs(std::string str)
 {
     if (str.empty())
-        throw std::invalid_argument("Code string is empty");
+        throw std::invalid_argument("Code string is empty\n");
 
     std::vector<std::pair<char, size_t>> sps;
     size_t c = 1;
