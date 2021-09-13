@@ -16,96 +16,114 @@ enum commands
     LEFT_BRACKET = '['
 };
 
+enum command_types
+{
+    START = '0',
+    CHANGE_CELL = '+',
+    MOVE_HEAD = '>',
+    OUT = '.',
+    LOOP = ']'
+};
+
 const size_t BUF_SIZE = 30000;
 
 class cmd
 {
+
   public:
-    cmd(std::shared_ptr<int> head_, char *buf_, int am_) : head(std::move(head_)), buf(buf_), am(am_){};
-    void nxt(std::unique_ptr<cmd>);
-    cmd *get_nxt();
-    virtual void fn();
+    cmd(int am_) : am(am_){};
+    cmd *get_clear_next();
+    virtual void set_next(cmd *next);
+    virtual cmd *get_next();
+    virtual int execute(int cell_value);
+    virtual command_types get_cmd_type();
+    virtual ~cmd();
 
   protected:
-    std::unique_ptr<cmd> nxt_;
-    std::shared_ptr<int> head;
-    char *buf;
+    command_types c = START;
+    cmd *_next = nullptr;
     int am = 0;
 };
 
-class decc : public cmd
+class decrement_cmd : public cmd
 {
+    command_types c = CHANGE_CELL;
+
   public:
-    decc(std::shared_ptr<int> head, char *buf, int am);
-    void fn() override;
+    decrement_cmd(int am);
+    command_types get_cmd_type() override;
+    int execute(int cell_value) override;
 };
 
-class incc : public cmd
+class increment_cmd : public cmd
 {
+    command_types c = CHANGE_CELL;
+
   public:
-    void fn() override;
-    incc(std::shared_ptr<int> head, char *buf, int am);
+    int execute(int cell_value) override;
+    increment_cmd(int am);
+    command_types get_cmd_type() override;
 };
 
-class mvlc : public cmd
+class move_left_cmd : public cmd
 {
+    command_types c = MOVE_HEAD;
+
   public:
-    mvlc(std::shared_ptr<int> head, char *buf, int am);
-    void fn() override;
+    move_left_cmd(int am);
+    int execute(int cell_value) override;
+    command_types get_cmd_type() override;
 };
 
-class mvrc : public cmd
+class move_right_cmd : public cmd
 {
+    command_types c = MOVE_HEAD;
+
   public:
-    mvrc(std::shared_ptr<int> head, char *buf, int am);
-    void fn() override;
+    move_right_cmd(int am);
+    int execute(int cell_value) override;
+    command_types get_cmd_type() override;
 };
 
-class blc : public cmd
+class loop_cmd : public cmd
 {
-  private:
-    cmd *elc = nullptr;
+    bool inner_flag = true;
+    command_types c = LOOP;
+    cmd *inner_next = nullptr;
 
   public:
-    blc(std::shared_ptr<int> head, char *buf, int am);
-    void set_elc(cmd *elc_);
-    void fn() override;
+    ~loop_cmd();
+    void set_flag(bool par);
+    loop_cmd(int am);
+    void set_next(cmd *next) override;
+    int execute(int cell_value) override;
+    cmd *get_next() override;
 };
 
-class elc : public cmd
+class out_cmd : public cmd
 {
-  private:
-    cmd *blc = nullptr;
+    command_types c = OUT;
 
   public:
-    elc(std::shared_ptr<int> head, char *buf, int am);
-    void set_blc(cmd *blc_);
-    void fn() override;
-};
-
-class outc : public cmd
-{
-  public:
-    outc(std::shared_ptr<int> head, char *buf, int am);
-    void fn() override;
+    out_cmd(int am);
+    int execute(int cell_value) override;
+    command_types get_cmd_type() override;
 };
 
 class bfmachine
 {
   private:
-  public:
-    bfmachine();
-
-  private:
-    std::unique_ptr<cmd> first_cmd;
+    cmd *first_cmd = nullptr;
+    std::vector<char> cells;
     int head = 0;
-    static std::vector<std::pair<char, size_t>> s_to_ps(std::string str);
-    char cpu[BUF_SIZE] = {0};
     bool used = false;
 
   public:
-    char *cpu_first;
     void init(std::string str);
-    void execute();
+    std::vector<std::pair<char, size_t>> string_to_pairs(std::string str);
+    template <command_types c> void change_state(int param);
+    void run();
+    void runtime_dispatch(command_types c, int param);
+    virtual ~bfmachine();
 };
 #endif // BF_MACHINE_BFMACHINE_HPP

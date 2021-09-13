@@ -2,132 +2,171 @@
 #include <stack>
 #include <utility>
 
-void cmd::nxt(std::unique_ptr<cmd> nxt)
+void cmd::set_next(cmd *nxt)
 {
-    nxt_ = std::move(nxt);
+    _next = nxt;
 }
 
-cmd *cmd::get_nxt()
+cmd *cmd::get_next()
 {
-    return nxt_.get();
+    return _next;
 }
 
-void cmd::fn()
+int cmd::execute(int cell_value)
 {
-    if (nxt_)
-        nxt_->fn();
+    return 0;
 }
 
-void decc::fn()
+command_types cmd::get_cmd_type()
 {
-    buf[*head] -= am;
-    if (nxt_)
-        nxt_->fn();
+    return c;
 }
 
-decc::decc(std::shared_ptr<int> head, char *buf, int am) : cmd(std::move(head), buf, am)
+cmd::~cmd()
 {
 }
 
-void incc::fn()
+cmd *cmd::get_clear_next()
 {
-    buf[*head] += am;
-    if (nxt_)
-        nxt_->fn();
+    return _next;
 }
 
-incc::incc(std::shared_ptr<int> head, char *buf, int am) : cmd(std::move(head), buf, am)
+int decrement_cmd::execute(int cell_value)
 {
+    return -am;
 }
 
-void mvlc::fn()
-{
-    if (((*head) -= am) < 0)
-        throw std::logic_error("An attempt to move head pointer to cell which index is less than zero\n");
-    if (nxt_)
-        nxt_->fn();
-}
-
-mvlc::mvlc(std::shared_ptr<int> head, char *buf, int am) : cmd(std::move(head), buf, am)
+decrement_cmd::decrement_cmd(int am) : cmd(am)
 {
 }
 
-void mvrc::fn()
+command_types decrement_cmd::get_cmd_type()
 {
-    if (((*head) += am) >= BUF_SIZE)
-        throw std::logic_error("An attempt to move head pointer to cell which index is more than number of cells\n");
-    if (nxt_)
-        nxt_->fn();
+    return c;
 }
 
-mvrc::mvrc(std::shared_ptr<int> head, char *buf, int am) : cmd(std::move(head), buf, am)
+int increment_cmd::execute(int cell_value)
+{
+    return am;
+}
+
+increment_cmd::increment_cmd(int am) : cmd(am)
 {
 }
 
-void blc::fn()
+command_types increment_cmd::get_cmd_type()
 {
-    if (buf[*head] == 0)
-        elc->fn();
+    return c;
+}
+
+int move_left_cmd::execute(int cell_value)
+{
+    return -am;
+}
+
+move_left_cmd::move_left_cmd(int am) : cmd(am)
+{
+}
+
+command_types move_left_cmd::get_cmd_type()
+{
+    return c;
+}
+
+int move_right_cmd::execute(int cell_value)
+{
+    return am;
+}
+
+move_right_cmd::move_right_cmd(int am) : cmd(am)
+{
+}
+
+command_types move_right_cmd::get_cmd_type()
+{
+    return c;
+}
+
+int out_cmd::execute(int cell_value)
+{
+    return am;
+}
+
+out_cmd::out_cmd(int am) : cmd(am)
+{
+}
+
+command_types out_cmd::get_cmd_type()
+{
+    return c;
+}
+
+loop_cmd::loop_cmd(int am) : cmd(am)
+{
+}
+
+int loop_cmd::execute(int cell_value)
+{
+    if (cell_value == 0)
+        inner_flag = false;
     else
-        nxt_->fn();
+        inner_flag = true;
+    return 0;
 }
 
-void blc::set_elc(cmd *elc_)
+cmd *loop_cmd::get_next()
 {
-    elc = elc_;
+    if (inner_flag)
+        return inner_next;
+    else
+        return _next;
 }
 
-blc::blc(std::shared_ptr<int> head, char *buf, int am) : cmd(std::move(head), buf, am)
+void loop_cmd::set_flag(bool par)
 {
+    inner_flag = par;
 }
 
-void elc::fn()
+void loop_cmd::set_next(cmd *next)
 {
-    if (buf[*head] == 0)
+    if (inner_flag)
     {
-        if (nxt_)
-            nxt_->fn();
+        inner_next = next;
     }
     else
-        blc->fn();
+    {
+        _next = next;
+    }
 }
 
-void elc::set_blc(cmd *blc_)
-{
-    blc = blc_;
-}
-
-elc::elc(std::shared_ptr<int> head, char *buf, int am) : cmd(std::move(head), buf, am)
-{
-}
-
-void outc::fn()
+loop_cmd::~loop_cmd()
 {
 
-    for (auto i = 0; i < am; ++i)
-        std::cout << buf[*head];
-    if (nxt_)
-        nxt_->fn();
+    cmd *ptr = this->inner_next;
+    while (ptr->get_next() != this)
+    {
+        auto temp = ptr;
+        ptr = temp->get_next();
+        delete temp;
+    }
 }
 
-outc::outc(std::shared_ptr<int> head, char *buf, int am) : cmd(std::move(head), buf, am)
-{
-}
-
-std::vector<std::pair<char, size_t>> bfmachine::s_to_ps(std::string str)
+std::vector<std::pair<char, size_t>> bfmachine::string_to_pairs(std::string str)
 {
     if (str.empty())
         throw std::invalid_argument("Code string is empty");
 
     std::vector<std::pair<char, size_t>> sps;
     size_t c = 1;
-    for (auto i = ++str.begin(); i != ++str.end(); ++i)
+    for (std::string::iterator iter = str.begin(); iter != str.end(); ++iter)
     {
-        if ((*i) == *(i - 1) && (*i) != LEFT_BRACKET && (*i) != RIGHT_BRACKET)
+        if (*iter == *(std::next(iter)) && *iter != LEFT_BRACKET && *iter != RIGHT_BRACKET)
+        {
             ++c;
+        }
         else
         {
-            sps.emplace_back(*(i - 1), c);
+            sps.emplace_back(*iter, c);
             c = 1;
         }
     }
@@ -137,65 +176,56 @@ std::vector<std::pair<char, size_t>> bfmachine::s_to_ps(std::string str)
 void bfmachine::init(std::string str)
 {
     used = false;
-    std::shared_ptr<int> head_ptr = std::make_shared<int>(head);
-    *head_ptr = 0;
-    for (auto i = 0; i < BUF_SIZE; ++i)
-    {
-        cpu[i] = 0;
-    }
-    std::stack<blc *> stack;
-    auto ps = s_to_ps(str);
-    cmd *current_ptr;
-    if (first_cmd.get())
-        first_cmd = std::move(first_cmd);
-    else
-        first_cmd = std::make_unique<cmd>(cmd(head_ptr, cpu_first, 1));
-    current_ptr = first_cmd.get();
+    head = 0;
+    cells.clear();
+    cells.push_back(0);
+    delete first_cmd;
+    first_cmd = new cmd(1);
+    cmd *current_cmd = first_cmd;
+    std::stack<loop_cmd *> stack;
+    auto ps = string_to_pairs(str);
+
     for (auto p : ps)
     {
         switch (p.first)
         {
         case MINUS: {
-            current_ptr->nxt(std::make_unique<decc>(head_ptr, cpu_first, p.second));
-            current_ptr = current_ptr->get_nxt();
+            current_cmd->set_next(new decrement_cmd(p.second));
+            current_cmd = current_cmd->get_next();
             break;
         }
         case PLUS: {
-            current_ptr->nxt(std::make_unique<incc>(head_ptr, cpu_first, p.second));
-            current_ptr = current_ptr->get_nxt();
+            current_cmd->set_next(new increment_cmd(p.second));
+            current_cmd = current_cmd->get_next();
             break;
         }
         case LEFT: {
-            current_ptr->nxt(std::make_unique<mvlc>(head_ptr, cpu_first, p.second));
-            current_ptr = current_ptr->get_nxt();
+            current_cmd->set_next(new move_left_cmd(p.second));
+            current_cmd = current_cmd->get_next();
             break;
         }
         case RIGHT: {
-            current_ptr->nxt(std::make_unique<mvrc>(head_ptr, cpu_first, p.second));
-            current_ptr = current_ptr->get_nxt();
-            break;
-        }
-        case LEFT_BRACKET: {
-            auto blc_ = std::make_unique<blc>(head_ptr, cpu_first, p.second);
-            stack.push(blc_.get());
-            current_ptr->nxt(std::move(blc_));
-            current_ptr = current_ptr->get_nxt();
-            break;
-        }
-        case RIGHT_BRACKET: {
-            if (stack.empty())
-                throw std::logic_error("Left bracket '[' is missing");
-            auto elc_ = std::make_unique<elc>(head_ptr, cpu_first, p.second);
-            stack.top()->set_elc(elc_.get());
-            elc_->set_blc(stack.top());
-            current_ptr->nxt(std::move(elc_));
-            current_ptr = current_ptr->get_nxt();
-            stack.pop();
+            current_cmd->set_next(new move_right_cmd(p.second));
+            current_cmd = current_cmd->get_next();
             break;
         }
         case POINT: {
-            current_ptr->nxt(std::make_unique<outc>(head_ptr, cpu_first, p.second));
-            current_ptr = current_ptr->get_nxt();
+            current_cmd->set_next(new out_cmd(p.second));
+            current_cmd = current_cmd->get_next();
+            break;
+        }
+        case LEFT_BRACKET: {
+            stack.push(new loop_cmd(1));
+            current_cmd->set_next(stack.top());
+            current_cmd = current_cmd->get_next();
+            stack.top()->set_flag(true);
+            break;
+        }
+        case RIGHT_BRACKET: {
+            current_cmd->set_next(stack.top());
+            stack.top()->set_flag(false);
+            current_cmd = stack.top();
+            stack.pop();
             break;
         }
         default:
@@ -204,20 +234,79 @@ void bfmachine::init(std::string str)
     }
     if (!stack.empty())
         throw std::logic_error("Right bracket ']' is missing\n");
-    if (current_ptr == first_cmd.get())
+    if (current_cmd == first_cmd)
         throw std::logic_error("There isn't brainfuck code in string/file\n");
 }
 
-void bfmachine::execute()
+bfmachine::~bfmachine()
 {
-    if (used)
-        throw std::logic_error("You should reinit your bfmachine before next execution");
-    used = true;
-    if (first_cmd && first_cmd->get_nxt() != nullptr)
-        first_cmd->fn();
+    auto ptr = first_cmd;
+    while (ptr)
+    {
+        auto temp = ptr;
+        ptr = ptr->get_clear_next();
+        delete temp;
+    }
 }
 
-bfmachine::bfmachine()
+void bfmachine::run()
 {
-    cpu_first = cpu;
+    if (used)
+        throw std::runtime_error("You should reinitialize bfmachine before using one more time\n");
+    auto ptr = first_cmd;
+    while (ptr)
+    {
+        runtime_dispatch(ptr->get_cmd_type(), ptr->execute(cells[head]));
+        if (!ptr->get_next())
+            ptr = nullptr;
+        else
+            ptr = ptr->get_next();
+    }
+    used = true;
+}
+
+template <command_types c> void bfmachine::change_state(int param)
+{
+    if constexpr (c == CHANGE_CELL)
+    {
+        cells[head] += param;
+    }
+    if constexpr (c == MOVE_HEAD)
+    {
+        if (head + param > BUF_SIZE || head + param < 0)
+        {
+            throw std::out_of_range("Head pointer out of cells range\n");
+        }
+        while (cells.size() <= head + param + 1)
+            cells.push_back(0);
+        head += param;
+    }
+    if constexpr (c == OUT)
+    {
+        for (auto i = 0; i < param; ++i)
+            std::cout << cells[head];
+    }
+    if constexpr (c == LOOP)
+    {
+    }
+}
+
+void bfmachine::runtime_dispatch(command_types c, int param)
+{
+    if (c == CHANGE_CELL)
+    {
+        change_state<CHANGE_CELL>(param);
+    }
+    if (c == MOVE_HEAD)
+    {
+        change_state<MOVE_HEAD>(param);
+    }
+    if (c == LOOP)
+    {
+        change_state<LOOP>(param);
+    }
+    if (c == OUT)
+    {
+        change_state<OUT>(param);
+    }
 }
