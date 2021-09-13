@@ -13,3 +13,14 @@ To run on yout linux machin make 'git clone' of this rep and use command 'make' 
 
 To run compiler with string use comand ` ./bfmachine "your_code" `
 To run compiler with file use flag `-f` like that `./bfmachine -f "way_to_your_file"`
+
+
+### Usage example
+
+`./bin/bfmachine "++++++++[>++++[>++>+++>+++>+<<<<-]>+>+>->>+[<]<-]>>.>---.+++ ++++..+++.>>.<-.<.+++.------.--------.>>+.>++."`
+
+![HelloWorld](out_examples/hello_world_out.png)
+
+`[theredrover@TheRedRoverLTP brainfuck]$ ./bin/bfmachine -f test/Mandelbrot.bf`
+
+![MandelbrotFractal](out_examples/Mandelbrot_fractal.png)

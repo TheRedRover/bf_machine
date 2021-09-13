@@ -146,10 +146,10 @@ loop_cmd::~loop_cmd()
 
     cmd *ptr = this->inner_next;
     if(ptr && this!=ptr)
-        while (ptr->get_next() != this)
+        while (ptr->get_clear_next() != this)
         {
             auto temp = ptr;
-            ptr = temp->get_next();
+            ptr = temp->get_clear_next();
             delete temp;
         }
 }
@@ -252,6 +252,7 @@ bfmachine::~bfmachine()
         ptr = ptr->get_clear_next();
         delete temp;
     }
+    delete ptr;
 }
 
 void bfmachine::run()
