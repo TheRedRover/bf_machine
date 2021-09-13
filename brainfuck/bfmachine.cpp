@@ -116,6 +116,8 @@ int loop_cmd::execute(int cell_value)
 
 cmd *loop_cmd::get_next()
 {
+    if(inner_next==_next&&!inner_flag)
+        return nullptr;
     if (inner_flag)
         return inner_next;
     else
@@ -143,12 +145,13 @@ loop_cmd::~loop_cmd()
 {
 
     cmd *ptr = this->inner_next;
-    while (ptr->get_next() != this)
-    {
-        auto temp = ptr;
-        ptr = temp->get_next();
-        delete temp;
-    }
+    if(ptr && this!=ptr)
+        while (ptr->get_next() != this)
+        {
+            auto temp = ptr;
+            ptr = temp->get_next();
+            delete temp;
+        }
 }
 
 std::vector<std::pair<char, size_t>> bfmachine::string_to_pairs(std::string str)
@@ -222,6 +225,8 @@ void bfmachine::init(std::string str)
             break;
         }
         case RIGHT_BRACKET: {
+            if(stack.empty())
+                throw std::logic_error("Left bracket '[' is missing\n");
             current_cmd->set_next(stack.top());
             stack.top()->set_flag(false);
             current_cmd = stack.top();
