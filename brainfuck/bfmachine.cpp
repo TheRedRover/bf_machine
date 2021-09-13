@@ -116,7 +116,7 @@ int loop_cmd::execute(int cell_value)
 
 cmd *loop_cmd::get_next()
 {
-    if(inner_next==_next&&!inner_flag)
+    if (inner_next == _next && !inner_flag)
         return nullptr;
     if (inner_flag)
         return inner_next;
@@ -145,7 +145,7 @@ loop_cmd::~loop_cmd()
 {
 
     cmd *ptr = this->inner_next;
-    if(ptr && this!=ptr)
+    if (ptr && this != ptr)
         while (ptr->get_clear_next() != this)
         {
             auto temp = ptr;
@@ -225,7 +225,7 @@ void bfmachine::init(std::string str)
             break;
         }
         case RIGHT_BRACKET: {
-            if(stack.empty())
+            if (stack.empty())
                 throw std::logic_error("Left bracket '[' is missing\n");
             current_cmd->set_next(stack.top());
             stack.top()->set_flag(false);
