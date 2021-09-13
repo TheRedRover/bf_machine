@@ -17,10 +17,10 @@ To run compiler with file use flag `-f` like that `./bfmachine -f "way_to_your_f
 
 ### Usage examples
 
-`./bin/bfmachine "++++++++[>++++[>++>+++>+++>+<<<<-]>+>+>->>+[<]<-]>>.>---.+++ ++++..+++.>>.<-.<.+++.------.--------.>>+.>++."`
+`$ ./bin/bfmachine "++++++++[>++++[>++>+++>+++>+<<<<-]>+>+>->>+[<]<-]>>.>---.+++ ++++..+++.>>.<-.<.+++.------.--------.>>+.>++."`
 
 ![HelloWorld](out_examples/hello_world_out.png)
 
-`[theredrover@TheRedRoverLTP brainfuck]$ ./bin/bfmachine -f test/Mandelbrot.bf`
+`$ ./bin/bfmachine -f test/Mandelbrot.bf`
 
 ![MandelbrotFractal](out_examples/Mandelbrot_fractal.png)
